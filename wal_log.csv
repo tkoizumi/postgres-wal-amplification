@@ -1,0 +1,4 @@
+ts,wal_bytes,wal_records,wal_fpi,checkpoints_timed,checkpoints_req,buffers_checkpoint,buffers_backend,tup_inserted,tup_updated,tup_deleted
+2026-04-20 17:39:39.876781-04:00,397500,412,92,9402,17,152,21,65,5,0
+2026-04-20 17:40:22.410093-04:00,398441,417,95,9402,17,152,21,66,5,0
+2026-04-20 17:40:26.428700-04:00,398605,419,95,9403,17,156,21,66,5,0

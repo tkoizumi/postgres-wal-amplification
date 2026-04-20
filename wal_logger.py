@@ -1,0 +1,93 @@
+import csv
+import time
+from pathlib import Path
+
+import psycopg
+
+DSN = "dbname=wal_test user=taka host=localhost"
+
+QUERY = """
+SELECT
+    now() AS ts,
+    w.wal_bytes,
+    w.wal_records,
+    w.wal_fpi,
+    b.checkpoints_timed,
+    b.checkpoints_req,
+    b.buffers_checkpoint,
+    b.buffers_backend,
+    d.tup_inserted,
+    d.tup_updated,
+    d.tup_deleted
+FROM pg_stat_wal w
+CROSS JOIN pg_stat_bgwriter b
+JOIN pg_stat_database d
+  ON d.datname = current_database();
+"""
+
+
+def main():
+    log_file_name = "wal_log.csv"
+
+    prev_wal_bytes = 0
+
+    conn = psycopg.connect(DSN, autocommit=True)
+    cur = conn.cursor()
+
+    with open("wal_log.csv", "a+", newline="") as f:
+        if not Path(log_file_name).exists():
+            writer = csv.writer(f)
+            writer.writerow(
+                [
+                    "ts",
+                    "wal_bytes",
+                    "wal_records",
+                    "wal_fpi",
+                    "checkpoints_timed",
+                    "checkpoints_req",
+                    "buffers_checkpoint",
+                    "buffers_backend",
+                    "tup_inserted",
+                    "tup_updated",
+                    "tup_deleted",
+                ]
+            )
+        else:
+            f.seek(0)
+            reader = csv.reader(f)
+            rows = list(reader)
+            print(rows)
+            last_row = rows[-1]
+            prev_wal_bytes = int(last_row[1])
+
+    try:
+
+        while True:
+            cur.execute("SELECT w.wal_bytes FROM pg_stat_wal w")
+            row = cur.fetchone()
+            if row == None:
+                continue
+            else:
+                wal_bytes = int(row[0])
+                if wal_bytes <= prev_wal_bytes:
+                    continue
+                else:
+                    with open("wal_log.csv", "a", newline="") as f:
+                        writer = csv.writer(f)
+                        cur.execute(QUERY)
+                        row = cur.fetchone()
+                        if row == None:
+                            return
+                        writer.writerow(row)
+                        f.flush()
+                        print(row)
+
+                    prev_wal_bytes = wal_bytes
+
+            time.sleep(1)
+    finally:
+        cur.close()
+
+
+if __name__ == "__main__":
+    main()
