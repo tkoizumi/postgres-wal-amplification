@@ -6,7 +6,7 @@ from typing import cast
 import psycopg
 from psycopg.abc import Query
 
-from query_builder import build_csv_headers, build_query
+from builder import build_csv_headers, build_query, build_wal_bytes_query
 
 DSN = "dbname=wal_test user=taka host=localhost"
 
@@ -15,6 +15,7 @@ def main():
     log_file_name = "wal_log.csv"
     query = cast(Query, build_query())
     csv_headers = build_csv_headers()
+    wal_bytes_query = cast(Query, build_wal_bytes_query())
 
     prev_wal_bytes = 0
 
@@ -36,7 +37,7 @@ def main():
     try:
 
         while True:
-            cur.execute("SELECT w.wal_bytes FROM pg_stat_wal w")
+            cur.execute(wal_bytes_query)
             row = cur.fetchone()
             if row == None:
                 continue

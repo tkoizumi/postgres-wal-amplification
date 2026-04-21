@@ -26,3 +26,9 @@ def build_query() -> str:
 
 def build_csv_headers() -> List[str]:
     return [metric.csv_name for metric in METRICS]
+
+
+def build_wal_bytes_query() -> str:
+    return f"""
+    SELECT w.wal_bytes FROM pg_stat_wal w
+    """
