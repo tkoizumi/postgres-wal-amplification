@@ -1,4 +1,4 @@
-from psycopg import sql
+from typing import List
 
 from metrics import METRICS
 
@@ -22,3 +22,7 @@ def build_query() -> str:
         WHERE datname = current_database()
     ) db
     """
+
+
+def build_csv_headers() -> List[str]:
+    return [metric.csv_name for metric in METRICS]

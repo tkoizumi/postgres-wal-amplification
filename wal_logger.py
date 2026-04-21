@@ -6,7 +6,7 @@ from typing import cast
 import psycopg
 from psycopg.abc import Query
 
-from query_builder import build_query
+from query_builder import build_csv_headers, build_query
 
 DSN = "dbname=wal_test user=taka host=localhost"
 
@@ -14,6 +14,7 @@ DSN = "dbname=wal_test user=taka host=localhost"
 def main():
     log_file_name = "wal_log.csv"
     query = cast(Query, build_query())
+    csv_headers = build_csv_headers()
 
     prev_wal_bytes = 0
 
@@ -23,21 +24,7 @@ def main():
     with open("wal_log.csv", "a+", newline="") as f:
         if not Path(log_file_name).exists():
             writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "ts",
-                    "wal_bytes",
-                    "wal_records",
-                    "wal_fpi",
-                    "checkpoints_timed",
-                    "checkpoints_req",
-                    "buffers_checkpoint",
-                    "buffers_backend",
-                    "tup_inserted",
-                    "tup_updated",
-                    "tup_deleted",
-                ]
-            )
+            writer.writerow(csv_headers)
         else:
             f.seek(0)
             reader = csv.reader(f)
