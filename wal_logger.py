@@ -1,33 +1,19 @@
 import csv
 import time
 from pathlib import Path
+from typing import cast
 
 import psycopg
+from psycopg.abc import Query
+
+from query_builder import build_query
 
 DSN = "dbname=wal_test user=taka host=localhost"
-
-QUERY = """
-SELECT
-    now() AS ts,
-    w.wal_bytes,
-    w.wal_records,
-    w.wal_fpi,
-    b.checkpoints_timed,
-    b.checkpoints_req,
-    b.buffers_checkpoint,
-    b.buffers_backend,
-    d.tup_inserted,
-    d.tup_updated,
-    d.tup_deleted
-FROM pg_stat_wal w
-CROSS JOIN pg_stat_bgwriter b
-JOIN pg_stat_database d
-  ON d.datname = current_database();
-"""
 
 
 def main():
     log_file_name = "wal_log.csv"
+    query = cast(Query, build_query())
 
     prev_wal_bytes = 0
 
@@ -74,7 +60,7 @@ def main():
                 else:
                     with open("wal_log.csv", "a", newline="") as f:
                         writer = csv.writer(f)
-                        cur.execute(QUERY)
+                        cur.execute(query)
                         row = cur.fetchone()
                         if row == None:
                             return
