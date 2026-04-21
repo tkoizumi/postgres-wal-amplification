@@ -22,7 +22,7 @@ def main():
     conn = psycopg.connect(DSN, autocommit=True)
     cur = conn.cursor()
 
-    with open("wal_log.csv", "a+", newline="") as f:
+    with open(log_file_name, "a+", newline="") as f:
         if not Path(log_file_name).exists():
             writer = csv.writer(f)
             writer.writerow(csv_headers)
@@ -46,7 +46,7 @@ def main():
                 if wal_bytes <= prev_wal_bytes:
                     continue
                 else:
-                    with open("wal_log.csv", "a", newline="") as f:
+                    with open(log_file_name, "a", newline="") as f:
                         writer = csv.writer(f)
                         cur.execute(query)
                         row = cur.fetchone()
