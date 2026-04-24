@@ -32,3 +32,8 @@ def build_wal_bytes_query() -> str:
     return f"""
     SELECT w.wal_bytes FROM pg_stat_wal w
     """
+
+
+def build_dsn(dbname: str, user: str, host: str) -> str:
+    dsn = f"""dbname={dbname} user={user} host={host}"""
+    return dsn

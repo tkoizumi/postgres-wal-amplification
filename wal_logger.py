@@ -6,20 +6,26 @@ from typing import cast
 import psycopg
 from psycopg.abc import Query
 
-from builder import build_csv_headers, build_query, build_wal_bytes_query
+from builder import build_csv_headers, build_dsn, build_query, build_wal_bytes_query
 
 DSN = "dbname=wal_test user=taka host=localhost"
 
 
 def main():
     log_file_name = "wal_log.csv"
+    dbname = "wal_test"
+    user = "taka"
+    host = "localhost"
+
     query = cast(Query, build_query())
     csv_headers = build_csv_headers()
     wal_bytes_query = cast(Query, build_wal_bytes_query())
+    dsn = build_dsn(dbname, user, host)
+    print(dsn)
 
     prev_wal_bytes = 0
 
-    conn = psycopg.connect(DSN, autocommit=True)
+    conn = psycopg.connect(dsn, autocommit=True)
     cur = conn.cursor()
 
     with open(log_file_name, "a+", newline="") as f:
