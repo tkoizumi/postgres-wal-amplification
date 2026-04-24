@@ -19,7 +19,6 @@ def main():
     csv_headers = build_csv_headers()
     wal_bytes_query = cast(Query, build_wal_bytes_query())
     dsn = build_dsn(dbname, user, host)
-    print(dsn)
 
     prev_wal_bytes = 0
 
@@ -34,12 +33,11 @@ def main():
             f.seek(0)
             reader = csv.reader(f)
             rows = list(reader)
-            print(rows)
             last_row = rows[-1]
             prev_wal_bytes = int(last_row[1])
 
     try:
-
+        print("Running WAL logger")
         while True:
             cur.execute(wal_bytes_query)
             row = cur.fetchone()
