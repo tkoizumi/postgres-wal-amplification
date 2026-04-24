@@ -8,8 +8,6 @@ from psycopg.abc import Query
 
 from builder import build_csv_headers, build_dsn, build_query, build_wal_bytes_query
 
-DSN = "dbname=wal_test user=taka host=localhost"
-
 
 def main():
     log_file_name = "wal_log.csv"
